@@ -1,0 +1,33 @@
+{
+  "name": "timeline-proposals",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "start": "node server/static.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanhess/timeline.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/seanhess/timeline/issues"
+  },
+  "homepage": "https://github.com/seanhess/timeline",
+  "devDependencies": {
+    "jsx-loader": "^0.12.2",
+    "regenerator": "^0.4.12",
+    "regenerator-loader": "^1.0.0",
+    "webpack": "^1.4.13"
+  },
+  "dependencies": {
+    "axios": "0.4.1",
+    "immstruct": "1.1.0",
+    "immutable": "3.3.0",
+    "lodash": "2.4.1",
+    "omniscient": "2.0.1",
+    "react": "0.12.1"
+  }
+}
