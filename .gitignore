@@ -1,4 +1,4 @@
-build/
+build/bundle.js
 node_modules
 npm
 npm-debug.log
