@@ -7,7 +7,6 @@ var Immutable  = require('immutable')
 var component = require('omniscient')
 var immstruct  = require('immstruct')
 var _ = require('lodash')
-var axios = require('axios')
 
 var SimpleTable = require('./SimpleTable')
 
@@ -17,7 +16,6 @@ var SimpleTable = require('./SimpleTable')
 
 var App = component(function({cursor}) {
   var entries = cursor.cursor('entries')
-  console.log("AND HOW", cursor.toJS())
   return <div className="row">
     <div className="small-12 column">
       <h1>Entries</h1>
@@ -33,16 +31,8 @@ function render() {
   );
 }
 
-var state = immstruct({entries: []})
+var state = immstruct({entries: ENTRIES})
 state.on('swap', render)
-
-// Load data
-axios.get('/entries')
-.then((rs) => rs.data)
-.then(function(data) {
-  console.log("WOO", data)
-  state.cursor('entries').update(() => Immutable.fromJS(data))
-})
 
 render()
 

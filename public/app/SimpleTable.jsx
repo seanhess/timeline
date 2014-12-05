@@ -24,7 +24,7 @@ var Entry = component(function({entry}) {
     <div style={typeStyle}>{entry.get('entryType')}</div>
     <div style={dateStyle}>{entry.get('date')}</div>
   </div>
-})
+}).jsx
 
 var entryStyle = assign({
   paddingBottom: 40,

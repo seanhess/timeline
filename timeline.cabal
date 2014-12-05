@@ -21,14 +21,10 @@ executable timeline
   default-language:    Haskell2010
   build-depends:       
     base >=4.7 && <4.8,
-    scotty,
     aeson,
     text,
-    http-types,
     transformers,
-    wai-middleware-static,
     mtl,
-    wai-cors,
     cassava,
     bytestring,
     vector,

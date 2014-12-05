@@ -1,29 +1,26 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 
+import System.Environment
 import Prelude hiding (readFile)
-import Web.Scotty
-import Data.Aeson (FromJSON, ToJSON, toJSON)
-import Data.Text
-import qualified Data.Text.Lazy as TL
+import Data.Aeson (ToJSON, toJSON)
+import qualified Data.Aeson as A
+import Data.Text hiding (empty, head)
 import GHC.Generics
-import Data.Monoid ((<>))
-import Network.Wai.Middleware.Static
-import Control.Applicative ((<$>), pure)
-import Data.Maybe (fromMaybe)
-import System.Environment (lookupEnv)
+import Control.Applicative (pure)
 import Data.Time.Format
 import Data.Time.Calendar
 import System.Locale
 import Control.Monad
-import Control.Monad.IO.Class (liftIO)
-import Data.Vector (Vector)
+import Data.Vector (Vector, empty, toList)
 
 import Data.Csv
 import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (readFile)
+import qualified Data.ByteString.Lazy.Char8 as BSLC
 import qualified Data.ByteString.Char8 as BSC
 
+dayFormat :: String
 dayFormat = "%Y-%m-%d"
 
 data Entry = Entry {
@@ -52,24 +49,22 @@ parseDate = parseTime defaultTimeLocale dayFormat . BSC.unpack
 formatDate :: Day -> String
 formatDate = formatTime defaultTimeLocale dayFormat
 
-publicFolder = "public"
-
+main :: IO ()
 main = do
-  port <- fromMaybe "3000" <$> lookupEnv "PORT"
-  putStrLn $ "Listening on:" ++ port    
+  args <- getArgs
+  entries <- readEntries (head args)
+  putStr "var ENTRIES = "
+  BSLC.putStrLn $ A.encode $ toList entries
+  return ()
 
-  scotty (read port) $ do
+readEntries :: String -> IO (Vector Entry)
+readEntries input = do
+  c <- readFile input
+  let entries = decode HasHeader c :: Either String (Vector Entry)
+  case entries of
+    Left  err     -> do
+      putStrLn ("Could not parse" ++ err)
+      return empty
+    Right es -> return es
 
-    middleware $ staticPolicy (noDots >-> addBase publicFolder)
-
-    get "/entries" $ do
-      c <- liftIO $ readFile "data/data.csv"
-      let entries = decode HasHeader c :: Either String (Vector Entry)
-      case entries of
-        Left  err     -> raise (TL.pack err)
-        Right entries -> json entries
-
-    get (regex ".*") $ file (publicFolder <> "/index.html")
-
--- read the file into your types
 
