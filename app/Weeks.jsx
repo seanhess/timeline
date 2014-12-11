@@ -6,7 +6,7 @@ var moment = require("moment")
 
 module.exports = component(function({entries}) {
 
-  var grouped = Entries.groupByWeek(entries.toArray())
+  var grouped = Entries.groupByWeek(entries)
   var groups = Object.keys(grouped)
 
   var rows = groups.map(function(week) {

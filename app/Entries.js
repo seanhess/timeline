@@ -12,7 +12,7 @@ var moment = require('moment')
   
 // group them by week, where week is "Dec 13", etc. Or, hmm... where week is another moment
 exports.groupByWeek = function(entries) {
-  var grouped = groupBy(entries, startOfWeek)
+  var grouped = groupBy(entries.toArray(), startOfWeek)
   return grouped
 }
 
@@ -21,7 +21,7 @@ function week(entry) {
 }
 
 function startOfWeek(entry) {
-  var d = moment(entry.date)
+  var d = moment(entry.get('date'))
   var start = d.set('date', d.date() - d.day())
   return formatDate(start)
 }
