@@ -1,0 +1,34 @@
+
+
+.entry {
+  width: 200px;
+  height: 200px;
+  background: #f2f2f2;
+  position: relative;
+  background-size: cover;
+}
+
+.entry-link:hover .entry-overlay {
+  display:block
+}
+
+.entry-bg {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+
+.entry-overlay {
+  display: none;
+
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  padding: 10px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}

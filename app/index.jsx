@@ -7,6 +7,8 @@ var Immutable  = require('immutable')
 var component = require('omniscient')
 var immstruct  = require('immstruct')
 var _ = require('lodash')
+var Entries = require('./Entries')
+var Weeks = require('./Weeks')
 
 var SimpleTable = require('./SimpleTable')
 
@@ -16,11 +18,8 @@ var SimpleTable = require('./SimpleTable')
 
 var App = component(function({cursor}) {
   var entries = cursor.cursor('entries')
-  return <div className="row">
-    <div className="small-12 column">
-      <h1>Entries</h1>
-      <SimpleTable entries={entries}/>
-    </div>
+  return <div style={{padding: 10, width: 600}}>
+      <Weeks entries={entries}/>
   </div>
 }).jsx
 
@@ -33,6 +32,4 @@ function render() {
 
 var state = immstruct({entries: ENTRIES})
 state.on('swap', render)
-
 render()
-

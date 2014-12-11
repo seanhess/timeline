@@ -3,7 +3,6 @@ var component = require('omniscient')
 var {assign} = require('lodash')
 
 module.exports = component(function({entries}) {
-
   var rows = entries.toArray().map(function(entry) {
     return <Entry entry={entry}/>
   })
