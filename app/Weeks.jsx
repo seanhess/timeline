@@ -2,6 +2,7 @@ var React = require('react')
 var component = require('omniscient')
 var {assign} = require('lodash')
 var Entries = require('./Entries')
+var moment = require("moment")
 
 module.exports = component(function({entries}) {
 
@@ -12,7 +13,7 @@ module.exports = component(function({entries}) {
     return <Week week={week} entries={grouped[week]}/>
   })
 
-  return <div style={{background: 'red'}}>{rows}</div>
+  return <div>{rows}</div>
 }).jsx
 
 var Week = component(function({week, entries}) {
@@ -20,9 +21,11 @@ var Week = component(function({week, entries}) {
     return <Entry entry={entry}/>
   })
 
-  return <div>
-    <h3>Week: {week}</h3>
-    <div>{content}</div>
+  var weekDate = moment(week)
+
+  return <div className="week">
+    <div className="week-content">{content}</div>
+    <div className="week-label">{weekDate.format('MMMM')}</div>
   </div>
 }).jsx
 
@@ -35,6 +38,7 @@ var Entry = component(function({entry}) {
     <a className="entry-link" href={entry.get('url')} target="_blank">
       <div className="entry-bg"></div>
       <div className="entry-overlay">
+        <h4>{entry.get('name')}</h4>
         <div>{entry.get('comment')}</div>
       </div>
     </a>
@@ -42,7 +46,6 @@ var Entry = component(function({entry}) {
 
       //<div style={dateStyle}>{entry.get('date')}</div>
       //<div style={typeStyle}>{entry.get('entryType')}</div>
-    //<div>{entry.get('name')}</div>
 }).jsx
 
 

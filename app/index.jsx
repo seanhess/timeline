@@ -18,7 +18,7 @@ var SimpleTable = require('./SimpleTable')
 
 var App = component(function({cursor}) {
   var entries = cursor.cursor('entries')
-  return <div style={{padding: 10, width: 600}}>
+  return <div style={{padding: 10}}>
       <Weeks entries={entries}/>
   </div>
 }).jsx
