@@ -5,6 +5,13 @@
   position: relative;
 }
 
+body {
+  background-color: black
+}
+
+.week:nth-child(odd)		{ background-color:#111; }
+.week:nth-child(even)		{ background-color:#000; }
+
 .week-label {
   transform: rotate(90deg);
   transform-origin: left top 0;

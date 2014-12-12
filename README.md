@@ -1,12 +1,15 @@
 Timeline
 ==========
 
-- goodreads (looks good!)
-- instagram
-- github
+Setup
+--------------
 
-Easy Next Version
-------------------
+    brew install devil
 
-- [ ] display the items by week
-- [ ] add instagram photos (local js api if you can)
+Todo
+---------------
+
+- [ ] make the form be an entirely different page with its own scroll
+- [ ] add a fixed details view for when you can't edit
+- [ ] form -> details
+

@@ -2,69 +2,214 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 import System.Environment
-import Prelude hiding (readFile)
-import Data.Aeson (ToJSON, toJSON)
+import System.FilePath
+import System.Directory
+
+import Prelude hiding (readFile, writeFile)
+import Data.Aeson (ToJSON, toJSON, FromJSON)
 import qualified Data.Aeson as A
-import Data.Text hiding (empty, head)
+import Data.Text (Text, pack, unpack)
+import Data.Text.Encoding (encodeUtf8, decodeUtf8)
 import GHC.Generics
-import Control.Applicative (pure)
 import Data.Time.Format
 import Data.Time.Calendar
 import System.Locale
 import Control.Monad
-import Data.Vector (Vector, empty, toList)
+import Control.Monad.IO.Class (liftIO)
+import Control.Applicative ((<$>), pure, (<*>))
+import Data.Monoid ((<>))
+import Data.Maybe (fromJust, catMaybes)
 
-import Data.Csv
+import Network.Wai.Middleware.Static
+import Web.Scotty
+import Network.Wai.Parse
+
 import Data.ByteString (ByteString)
-import Data.ByteString.Lazy (readFile)
+import Data.ByteString.Lazy (readFile, writeFile)
+import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Lazy.Char8 as BSLC
 import qualified Data.ByteString.Char8 as BSC
+
+import Vision.Image.Storage (loadBS, save)
+import Vision.Image (RGB, convert, InterpolMethod(..), resize)
+import Vision.Primitive.Shape
+import Vision.Primitive (ix2, ix1)
+import Vision.Image.Type (manifestSize)
 
 dayFormat :: String
 dayFormat = "%Y-%m-%d"
 
+data EntryType = Moment | Book | Project 
+  deriving (Show, Eq, Generic)
+
 data Entry = Entry {
-   date :: Day,
-   entryType :: Text,
+   date :: Maybe Day,
+   entryType :: EntryType,
    name :: Text,
-   imageUrl :: Text,
+   image :: Text, -- not a url, just an image!
    comment :: Text,
    url :: Text
 } deriving (Show, Generic)
 
-instance FromRecord Entry
+instance ToJSON EntryType
+instance FromJSON EntryType
+
 instance ToJSON Entry
+instance FromJSON Entry
 
 instance ToJSON Day where
   toJSON day = toJSON $ formatDate day
 
-instance FromField Day where
-  parseField s = case parseDate s of
-      Nothing -> mzero
-      Just d  -> pure d
+instance FromJSON Day where
+  parseJSON (A.String txt) = case (parseDate $ encodeUtf8 txt) of
+                               Nothing -> mzero
+                               Just d  -> pure d
+  parseJSON _ = mzero
 
+dataFolder :: FilePath
+dataFolder = "data/entries/"
+
+entriesPath :: FilePath
+entriesPath = "data/entries.json"
+
+-- the day is 10 chars long. If it's a prefix it'll parse
 parseDate :: ByteString -> Maybe Day
-parseDate = parseTime defaultTimeLocale dayFormat . BSC.unpack
+parseDate = parseTime defaultTimeLocale dayFormat . take 10 . BSC.unpack
 
 formatDate :: Day -> String
 formatDate = formatTime defaultTimeLocale dayFormat
 
+-- based on the original file name
+-- eh, this sucks. I need to be able to do it from an entry too!
+-- ok, given the name, predict it!
+photoFilePath :: Entry -> FilePath
+photoFilePath e = dataFolder <> unpack (image e)
+
+-- based on the original file name
+thumbFilePath :: Entry -> FilePath
+thumbFilePath e = dataFolder <> unpack (name e) <> "-thumb.jpg"
+
+saveFile :: Entry -> FileInfo BL.ByteString -> IO ()
+saveFile e (FileInfo name tp content) = do
+  -- save the original file
+  let dest = photoFilePath e
+  putStrLn $ "SAVING " <> dest
+  writeFile dest content
+
+
+saveThumbnail :: Entry -> FileInfo BL.ByteString -> IO ()
+saveThumbnail e (FileInfo name tp content) = do
+  res <- loadBS Nothing $ BL.toStrict content
+
+  case res of
+    Left err  -> putStrLn "Error Reading Image"
+    Right img -> do
+      let rgb = convert img :: RGB
+          Z :. h :. w = manifestSize rgb
+          small = resize Bilinear (thumbSize w h) rgb :: RGB
+
+      save (thumbFilePath e) small
+      return ()
+
+
+thumbSize :: Int -> Int -> DIM2
+thumbSize w h = ix2 h' w'
+  where 
+    w' = 400 :: Int
+    h' = round $ (fromIntegral w') * (fromIntegral h / fromIntegral w) :: Int
+
+-- will crash if the file name doesn't parse into a date
+-- ok, so momentEntry is  is  is 
+momentEntry :: FileInfo a -> Entry
+momentEntry (FileInfo name tp _) = Entry {
+    date = parseDate name,
+    entryType = Moment,
+    name = pack $ dropExtension $ BSC.unpack name,
+    image = decodeUtf8 name,
+    comment = "",
+    url = ""
+  }
+
+entryPath :: Text -> FilePath
+entryPath nm = dataFolder <> unpack nm <> ".json"
+
+writeEntryFile :: Entry -> IO ()
+writeEntryFile e = writeFile (entryPath (name e)) (A.encode e)
+
+readEntryFile :: FilePath -> IO (Maybe Entry)
+readEntryFile p = do
+  c <- readFile p
+  return $ A.decode c
+
+deleteEntry :: Entry -> IO () 
+deleteEntry e = do
+  moveDeletedFile $ photoFilePath e
+  moveDeletedFile $ thumbFilePath e
+  moveDeletedFile $ entryPath (name e)
+
+moveDeletedFile :: FilePath -> IO ()
+moveDeletedFile p = renameFile p $ "data/deleted/" <> takeFileName p
+
+saveIndex :: [Entry] -> IO ()
+saveIndex es = do
+  let s = A.encode es
+  writeFile entriesPath s
+
+loadIndex :: IO [Entry]
+loadIndex = do
+  paths <- getDirectoryContents dataFolder
+  let entryPaths = map (dataFolder <>) $ filter ((== ".json").takeExtension) paths
+  entries <- mapM readEntryFile entryPaths
+  return $ catMaybes entries
+
+generateIndex :: IO ()
+generateIndex = loadIndex >>= saveIndex
+
+
 main :: IO ()
 main = do
-  args <- getArgs
-  entries <- readEntries (head args)
-  putStr "var ENTRIES = "
-  BSLC.putStrLn $ A.encode $ toList entries
-  return ()
+  putStrLn "PORT 3000"
+  putStrLn "Woot"
 
-readEntries :: String -> IO (Vector Entry)
-readEntries input = do
-  c <- readFile input
-  let entries = decode HasHeader c :: Either String (Vector Entry)
-  case entries of
-    Left  err     -> do
-      putStrLn ("Could not parse" ++ err)
-      return empty
-    Right es -> return es
+  generateIndex
+
+  scotty 3000 $ do
+
+    middleware $ staticPolicy (noDots >-> addBase "../")
+
+    get "/" (redirect "/timeline/")
+    get "/timeline"  (file "index.html")
+    get "/test" (text "hello")
+
+    post "/files" $ do
+      fs <- files
+
+      liftIO $ forM_ fs $ \(_, f) -> do
+        let e = momentEntry f
+        writeEntryFile e
+        saveFile e f
+        saveThumbnail e f
+        generateIndex
+
+      text "OK"
+
+    put "/entries/:name" $ do
+      entry <- jsonData
+      liftIO $ do
+        writeEntryFile entry
+        generateIndex
+      text "OK"
+
+    delete "/entries/:name" $ do
+      n <- param "name"
+      liftIO $ do
+        me <- readEntryFile (entryPath n)
+        case me of
+          Nothing -> return ()
+          Just e  -> do
+            deleteEntry e
+            generateIndex
+      text "OK"
 
 
+    --get "/timeline"     (file "index.html")

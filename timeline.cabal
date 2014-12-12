@@ -3,14 +3,14 @@
 
 name:                timeline
 version:             0.1.0.0
--- synopsis:            
--- description:         
+synopsis:            edits a timeline
+description:         edits a timeline
 -- license:             
 --license-file:        LICENSE
 author:              Sean Clark Hess
 maintainer:          sean@kuali.co
 -- copyright:           
--- category:            
+category:            application
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
@@ -20,14 +20,20 @@ executable timeline
   main-is:             Main.hs
   default-language:    Haskell2010
   build-depends:       
-    base >=4.7 && <4.8,
+    base,
     aeson,
     text,
     transformers,
     mtl,
-    cassava,
     bytestring,
     vector,
     time,
-    old-locale
+    old-locale,
+    scotty,
+    wai-middleware-static,
+    wai-extra,
+    filepath,
+    directory,
+    friday
+    
 
