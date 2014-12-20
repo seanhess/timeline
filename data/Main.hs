@@ -5,11 +5,13 @@ import System.Environment
 import System.FilePath
 import System.Directory
 
+import Debug.Trace
 import Prelude hiding (readFile, writeFile)
 import Data.Aeson (ToJSON, toJSON, FromJSON)
 import qualified Data.Aeson as A
 import Data.Text (Text, pack, unpack)
 import Data.Text.Encoding (encodeUtf8, decodeUtf8)
+import Data.List (stripPrefix)
 import GHC.Generics
 import Data.Time.Format
 import Data.Time.Calendar
@@ -166,6 +168,10 @@ generateIndex :: IO ()
 generateIndex = loadIndex >>= saveIndex
 
 
+-- requires a string -> string
+removePrefix :: String -> Policy
+removePrefix p = policy (stripPrefix p)
+
 main :: IO ()
 main = do
   putStrLn "PORT 3000"
@@ -175,7 +181,8 @@ main = do
 
   scotty 3000 $ do
 
-    middleware $ staticPolicy (noDots >-> addBase "../")
+    -- I want to say: if it comes in as /timeline, look locally!
+    middleware $ staticPolicy (noDots >-> removePrefix "timeline/" >-> addBase ".")
 
     get "/" (redirect "/timeline/")
     get "/timeline"  (file "index.html")
