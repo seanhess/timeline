@@ -12,11 +12,12 @@ var Editor = require('./Editor')
 var Details = require('./Details')
 var page = require('page')
 
-console.log("Timeline: v2")
+console.log("Timeline: v2.1")
 
 // INIT -------------------------------------------------------
 Entries.state.on('swap', render)
 Entries.load()
+Entries.checkCanEdit()
 
 // APP --------------------------------------------------------
 
@@ -76,7 +77,10 @@ page('/details/:name', route(function({params}) {
   return function() {
     return <div>
       <Weeks entries={Entries.state.cursor('entries')}/>
-      <Details.Entry entry={Entries.state.cursor('details')}/>
+      <Details.Entry 
+        entry={Entries.state.cursor('details')} 
+        canEdit={Entries.state.cursor('canEdit')}
+      />
     </div>
   }
 }))

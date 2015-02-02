@@ -19,7 +19,8 @@ var UNKNOWN = "unknown"
 var state = exports.state = immstruct({
   entries: [],
   editing: null, 
-  details: null
+  details: null,
+  canEdit: false,
 })
 
 exports.findByName = function(name) {
@@ -33,6 +34,14 @@ exports.load = function() {
   .then((rs) => rs.data)
   .then(function(entries) {
     state.cursor('entries').update(() => Immutable.fromJS(entries))
+  })
+}
+
+// see if we're connected to a real server, if so, set canEdit to true
+exports.checkCanEdit = function() {
+  axios.get('/status')
+  .then(function() {
+    state.cursor('canEdit').update(() => true)
   })
 }
 

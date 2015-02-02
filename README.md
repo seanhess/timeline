@@ -1,15 +1,24 @@
 Timeline
 ==========
 
+
 Setup
 --------------
 
     brew install devil
 
+Run
+---------------
+
+    cabal run
+
 Todo
 ---------------
 
-- [ ] make the form be an entirely different page with its own scroll
-- [ ] add a fixed details view for when you can't edit
-- [ ] form -> details
+- [ ] add entry by hand
+- [ ] edit button only shown when available.
+
+- [ ] PROJECTS
+
+- [x] form another page
 

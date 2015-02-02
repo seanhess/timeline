@@ -184,6 +184,7 @@ main = do
     -- I want to say: if it comes in as /timeline, look locally!
     middleware $ staticPolicy (noDots >-> removePrefix "timeline/" >-> addBase ".")
 
+    get "/status" (text "OK")
     get "/" (redirect "/timeline/")
     get "/timeline"  (file "index.html")
     get "/test" (text "hello")

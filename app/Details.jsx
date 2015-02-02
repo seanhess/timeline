@@ -3,7 +3,7 @@ var component = require('omniscient')
 var Entries = require('./Entries')
 var page = require('page')
 
-exports.Entry = component(function({entry}) {
+exports.Entry = component(function({entry, canEdit}) {
 
   var style = {
     position: 'fixed',
@@ -31,10 +31,10 @@ exports.Entry = component(function({entry}) {
     position: 'absolute',
     top: 0,
     right: 20,
+    display: (canEdit.deref()) ? 'block' : 'none'
   }
 
   function onClose(e) {
-    console.log("WOOT", e.target)
     if (e.target.id != "edit-btn") {
       page('/timeline')
     }
@@ -45,7 +45,9 @@ exports.Entry = component(function({entry}) {
   return <div style={style} onClick={onClose}>
     <div className="row" style={{marginTop: 20}}>
       <div className="small-12 columns" style={parentStyle}>
-        <div style={buttonStyle}><a href={editUrl} id="edit-btn" className="button secondary">Edit</a></div>
+        <div style={buttonStyle}>
+          <a href={editUrl} id="edit-btn" className="button secondary">Edit</a>
+        </div>
         <div style={imageBoxStyle}>
           <a className="th"><img src={Entries.imageUrl(entry)} style={{height: '100%'}}/></a>
         </div>
