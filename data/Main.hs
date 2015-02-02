@@ -5,6 +5,7 @@ import System.Environment
 import System.FilePath
 import System.Directory
 
+import Control.Exception (catch, IOException)
 import Debug.Trace
 import Prelude hiding (readFile, writeFile)
 import Data.Aeson (ToJSON, toJSON, FromJSON)
@@ -150,7 +151,12 @@ deleteEntry e = do
   moveDeletedFile $ entryPath (name e)
 
 moveDeletedFile :: FilePath -> IO ()
-moveDeletedFile p = renameFile p $ "data/deleted/" <> takeFileName p
+moveDeletedFile p = do
+  catch (renameFile p $ "data/deleted/" <> takeFileName p)
+        (catchIOException)
+
+catchIOException :: IOException -> IO ()
+catchIOException e = putStrLn $ "ERROR " <> (show e)
 
 saveIndex :: [Entry] -> IO ()
 saveIndex es = do

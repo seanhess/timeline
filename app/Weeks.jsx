@@ -3,6 +3,7 @@ var component = require('omniscient')
 var {assign} = require('lodash')
 var Entries = require('./Entries')
 var moment = require("moment")
+var page = require('page')
 
 module.exports = component(function({entries}) {
   var grouped = Entries.groupByWeek(entries)
@@ -22,9 +23,17 @@ var Week = component(function({week, entries}) {
 
   var weekDate = moment(week)
 
+  function clickWeek() {
+    var moment = Entries.emptyMoment(weekDate)
+    Entries.store(moment)
+    page('/edit/'+moment.get('name'))
+  }
+
   return <div className="week">
     <div className="week-content">{content}</div>
-    <div className="week-label">{weekDate.format('DD MMMM YYYY')}</div>
+    <div className="week-label">
+      <a onClick={clickWeek}>{weekDate.format('DD MMMM YYYY')}</a>
+    </div>
   </div>
 }).jsx
 

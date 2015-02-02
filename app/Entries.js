@@ -12,6 +12,7 @@ var Immutable = require('immutable')
 var {groupBy, foldl, sortBy, head} = require('lodash')
 var moment = require('moment')
 var axios = require('axios')
+var shortid = require('shortid')
 
 var EDIT_ENTRIES = "/entries"
 var UNKNOWN = "unknown"
@@ -46,28 +47,27 @@ exports.checkCanEdit = function() {
 }
 
 exports.edit = function(entry) {
-  var value = (entry) ? entry.deref() : entry
+  var value = (entry && entry.deref) ? entry.deref() : entry
   state.cursor('editing').update(() => value)
   state.cursor('details').update(() => null)
 }
 
 exports.details = function(entry) {
-  var value = (entry) ? entry.deref() : entry
+  var value = (entry && entry.deref) ? entry.deref() : entry
   state.cursor('editing').update(() => null)
   state.cursor('details').update(() => value)
 }
 
 exports.save = function(entry) {
   // update it in place.
-
-
   axios.put(EDIT_ENTRIES + "/" + entry.get('name'), entry.toJS())
   .then((rs) => rs.data)
-  .then(function() {
-    //window.location.reload()
-    var entries = state.cursor('entries')
-    entries.update(entryKeyPath(entries, entry.get('name')), () => entry.deref())
-  })
+  .then(exports.store)
+}
+
+exports.store = function(entry) {
+  var entries = state.cursor('entries')
+  entries.update(entryKeyPath(entries, entry.get('name')), () => entry)
 }
 
 exports.delete = function(entry) {
@@ -76,6 +76,17 @@ exports.delete = function(entry) {
   .then(function() {
     var entries = state.cursor('entries')
     entries.update((es) => es.remove(entryKeyPath(entries, entry.get('name'))))
+  })
+}
+
+exports.emptyMoment = function(date) {
+  return Immutable.Map({
+    entryType:"Moment",
+    url:"",
+    date: formatDate(date),
+    image:"",
+    name: shortid.generate(),
+    comment:""
   })
 }
   

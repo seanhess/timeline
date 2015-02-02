@@ -15,10 +15,11 @@ Run
 Todo
 ---------------
 
-- [ ] add entry by hand
-- [ ] edit button only shown when available.
+- [x] form another page
+
+- [ ] add entry/moment by hand? (attach picture later)
+- [x] edit button only shown when available.
 
 - [ ] PROJECTS
 
-- [x] form another page
 

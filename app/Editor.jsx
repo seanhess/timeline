@@ -16,8 +16,6 @@ function onFile(file) {
   xhr.open("POST", UPLOAD_URI, true);
   xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
-        console.log("RESPONSE", xhr.status, xhr.responseText)
-
         if (xhr.status == 200) {
           window.location.reload()
         }

@@ -53,7 +53,8 @@ function route(f) {
 }
 
 page('/timeline', route(function() {
-  console.log("BACK TO MAIN")
+  Entries.load()
+
   return function() {
     return <Weeks entries={Entries.state.cursor('entries')}/>
   }
