@@ -2,6 +2,7 @@ var React    = require('react/addons');
 var component = require('omniscient')
 var Entries = require('./Entries')
 var page = require('page')
+var {assign} = require('lodash')
 
 exports.Entry = component(function({entry, canEdit}) {
 
@@ -11,17 +12,7 @@ exports.Entry = component(function({entry, canEdit}) {
     top: 0, left: 0, bottom: 0, right: 0,
     backgroundColor: 'rgba(0,0,0,0.85)'
   }
-
-  var imageBoxStyle = {
-    height: 600,
-    margin: '0px auto'
-  }
-
-  var infoBoxStyle = {
-    marginTop: 20
-  }
   
-  var white = { color: 'white' }
 
   var parentStyle = {
     position:'relative'
@@ -40,7 +31,16 @@ exports.Entry = component(function({entry, canEdit}) {
     }
   }
 
-  var editUrl = "/edit/" + entry.get('name')
+  var editUrl = "/edit/" + entry.get('id')
+
+  var content = ""
+
+  if (entry.get('entryType') == "Moment") {
+    content = <Moment entry={entry} />
+  }
+  else {
+    content = <Generic entry={entry} />
+  }
 
   return <div style={style} onClick={onClose}>
     <div className="row" style={{marginTop: 20}}>
@@ -48,14 +48,45 @@ exports.Entry = component(function({entry, canEdit}) {
         <div style={buttonStyle}>
           <a href={editUrl} id="edit-btn" className="button secondary">Edit</a>
         </div>
-        <div style={imageBoxStyle}>
-          <a className="th"><img src={Entries.imageUrl(entry)} style={{height: '100%'}}/></a>
-        </div>
-        <div style={infoBoxStyle}>
-          <p style={white}>{entry.get('date')}</p>
-          <p style={white}>{entry.get('comment')}</p>
-        </div>
+        {content}
       </div>
     </div>
+  </div>
+}).jsx
+
+var white = { color: 'white' }
+var right = {float: 'right'}
+
+var imageBoxStyle = {
+  height: 600,
+  margin: '0px auto'
+}
+
+var infoBoxStyle = {
+  marginTop: 20
+}
+
+var Moment = component(function({entry}) {
+
+  var showImage = {display:(entry.get('image')) ? 'block' : 'none'}
+
+  return <div>
+    <div style={assign(imageBoxStyle, showImage)}>
+      <a className="th"><img src={Entries.imageUrl(entry)} style={{height: '100%'}}/></a>
+    </div>
+    <div style={infoBoxStyle}>
+      <h4 style={white}>{entry.get('name')}</h4>
+      <p style={white}>{entry.get('date')}</p>
+      <p style={white}>{entry.get('comment')}</p>
+    </div>
+  </div>
+}).jsx
+
+var Generic = component(function({entry}) {
+  console.log("GENERIC")
+  return <div style={infoBoxStyle}>
+    <h4 style={white}>{entry.get('entryType')}: {entry.get('name')}</h4>
+    <p style={white}>{entry.get('date')}</p>
+    <p style={white}>{entry.get('comment')}</p>
   </div>
 }).jsx

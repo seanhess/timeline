@@ -9,10 +9,10 @@ var page = require('page')
 
 //function updateEntryImage(entry) {
   //return function(file) {
-    //console.log("DROP FILE", entry.get('name'), file)
+    //console.log("DROP FILE", entry.get('id'), file)
     //var xhr = new XMLHttpRequest()
     //var fd = new FormData()
-    //var url = "/entries/"+entry.get('name')+'/image'
+    //var url = "/entries/"+entry.get('id')+'/image'
     //console.log("URL", url, entry.toJS())
     //xhr.open("PUT", url, true);
     //xhr.onreadystatechange = function() {
@@ -80,6 +80,14 @@ exports.Entry = component(function({entry}) {
           </div>
           <aside className="small-4 columns">
             <div><button onClick={onSave} className="expand">Save</button></div>
+            <div>
+              <select value={entry.get('entryType')} onChange={onEdit('entryType')}>
+                <option value="Moment">Moment</option>
+                <option value="Project">Project</option>
+                <option value="Book">Book</option>
+              </select>
+            </div>
+            <div><input type="text" placeholder="name" value={entry.get('name')} onChange={onEdit('name')} /></div>
             <div><textarea placeholder="comment" style={{height: 200}} onChange={onEdit('comment')} value={entry.get('comment')}>
             </textarea></div>
             <div><input type="text" placeholder="2014-10-20" onChange={onEdit('date')} value={entry.get('date')}/></div>

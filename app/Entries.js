@@ -24,9 +24,9 @@ var state = exports.state = immstruct({
   canEdit: false,
 })
 
-exports.findByName = function(name) {
+exports.findById = function(id) {
   return state.cursor('entries').find(function(e) {
-    return e.get('name') == name
+    return e.get('id') == id
   })
 }
 
@@ -60,22 +60,22 @@ exports.details = function(entry) {
 
 exports.save = function(entry) {
   // update it in place.
-  axios.put(EDIT_ENTRIES + "/" + entry.get('name'), entry.toJS())
+  axios.put(EDIT_ENTRIES + "/" + entry.get('id'), entry.toJS())
   .then((rs) => rs.data)
   .then(exports.store)
 }
 
 exports.store = function(entry) {
   var entries = state.cursor('entries')
-  entries.update(entryKeyPath(entries, entry.get('name')), () => entry)
+  entries.update(entryKeyPath(entries, entry.get('id')), () => entry)
 }
 
 exports.delete = function(entry) {
-  axios.delete(EDIT_ENTRIES + "/" + entry.get('name'))
+  axios.delete(EDIT_ENTRIES + "/" + entry.get('id'))
   .then((rs) => rs.data)
   .then(function() {
     var entries = state.cursor('entries')
-    entries.update((es) => es.remove(entryKeyPath(entries, entry.get('name'))))
+    entries.update((es) => es.remove(entryKeyPath(entries, entry.get('id'))))
   })
 }
 
@@ -85,7 +85,8 @@ exports.emptyMoment = function(date) {
     url:"",
     date: formatDate(date),
     image:"",
-    name: shortid.generate(),
+    id: shortid.generate(),
+    name: "",
     comment:""
   })
 }
@@ -115,7 +116,7 @@ exports.groupByWeek = function(entries) {
 }
 
 exports.thumbUrl = function(entry) {
-  return "data/entries/" + entry.get('name') + "-thumb.jpg"
+  return "data/entries/" + entry.get('id') + "-thumb.jpg"
 }
 
 exports.imageUrl = function(entry) {

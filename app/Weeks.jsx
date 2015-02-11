@@ -23,7 +23,7 @@ module.exports = component(function({entries}) {
 
 var Week = component(function({week, entries}) {
   var content = entries.map(function(entry) {
-    return <Entry entry={entry} key={entry.get('name')}/>
+    return <Entry entry={entry} key={entry.get('id')}/>
   })
 
   var weekDate = moment(week)
@@ -31,7 +31,7 @@ var Week = component(function({week, entries}) {
   function clickWeek() {
     var moment = Entries.emptyMoment(weekDate)
     Entries.store(moment)
-    page('/edit/'+moment.get('name'))
+    page('/edit/'+moment.get('id'))
   }
 
   return <div className="week">
@@ -48,24 +48,33 @@ var Week = component(function({week, entries}) {
 var Entry = component(function({entry}) {
   var url = entry.get('url')
 
-  var url = "/details/" + entry.get('name')
+  var url = "/details/" + entry.get('id')
 
   var infoStyle = {
-    display: (entry.get('image')) ? "none" : "block"
+    display: (entry.get('image')) ? "none" : "block",
+  }
+
+  var overlayStyle = {
+    display: (entry.get('image')) ? "block" : "none"
   }
 
   return <div className="entry" style={bgImage(Entries.thumbUrl(entry))}>
     <a className="entry-link" href={url}>
       <div className="entry-bg">
-        <div style={infoStyle}>{entry.get('comment')}</div>
+        <div style={infoStyle}>
+          <div><b>{entry.get('name')}</b></div>
+          <div>{entry.get('comment')}</div>
+        </div>
       </div>
       <div className="entry-overlay">
-        <div>{entry.get('comment')}</div>
+        <div style={overlayStyle}>
+          <div><b>{entry.get('name')}</b></div>
+          <div>{entry.get('comment')}</div>
+        </div>
       </div>
     </a>
   </div>
 }).jsx
-
 
 function bgImage(src) {
   return {

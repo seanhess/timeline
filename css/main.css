@@ -22,6 +22,11 @@ body {
   top: 10px;
 }
 
+.week-label a {
+  color: white;
+}
+
+
 .week-content {
   /*position: absolute;*/
   /*left: 20px;*/

@@ -58,9 +58,9 @@ page('/timeline', route(function() {
   }
 }))
 
-page('/edit/:name', route(function({params}) {
+page('/edit/:id', route(function({params}) {
 
-  var entry = Entries.findByName(params.name)
+  var entry = Entries.findById(params.id)
   Entries.edit(entry)
 
   return function() {
@@ -68,9 +68,9 @@ page('/edit/:name', route(function({params}) {
   }
 }))
 
-page('/details/:name', route(function({params}) {
+page('/details/:id', route(function({params}) {
 
-  var entry = Entries.findByName(params.name)
+  var entry = Entries.findById(params.id)
   Entries.details(entry)
 
   return function() {

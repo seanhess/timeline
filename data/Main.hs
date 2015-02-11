@@ -7,7 +7,7 @@ import System.Directory
 
 import Control.Exception (catch, IOException)
 import Debug.Trace
-import Prelude hiding (readFile, writeFile)
+import Prelude hiding (readFile, writeFile, id)
 import Data.Aeson (ToJSON, toJSON, FromJSON)
 import qualified Data.Aeson as A
 import Data.Text (Text, pack, unpack)
@@ -49,6 +49,7 @@ data Entry = Entry {
    date :: Maybe Day,
    entryType :: EntryType,
    name :: Text,
+   id :: Text,
    image :: Text, -- not a url, just an image!
    comment :: Text,
    url :: Text
@@ -90,7 +91,7 @@ photoFilePath e = dataFolder <> unpack (image e)
 
 -- based on the original file name
 thumbFilePath :: Entry -> FilePath
-thumbFilePath e = dataFolder <> unpack (name e) <> "-thumb.jpg"
+thumbFilePath e = dataFolder <> unpack (id e) <> "-thumb.jpg"
 
 saveFile :: Entry -> FileInfo BL.ByteString -> IO ()
 saveFile e (FileInfo name tp content) = do
@@ -125,19 +126,21 @@ thumbSize w h = ix2 h' w'
 -- ok, so momentEntry is  is  is 
 momentEntry :: FileInfo a -> Entry
 momentEntry (FileInfo name tp _) = Entry {
+    id = filename,
     date = parseDate name,
     entryType = Moment,
-    name = pack $ dropExtension $ BSC.unpack name,
+    name = "",
     image = decodeUtf8 name,
     comment = "",
     url = ""
   }
+  where filename = pack $ dropExtension $ BSC.unpack name
 
 entryPath :: Text -> FilePath
 entryPath nm = dataFolder <> unpack nm <> ".json"
 
 writeEntryFile :: Entry -> IO ()
-writeEntryFile e = writeFile (entryPath (name e)) (A.encode e)
+writeEntryFile e = writeFile (entryPath (id e)) (A.encode e)
 
 readEntryFile :: FilePath -> IO (Maybe Entry)
 readEntryFile p = do
@@ -148,7 +151,7 @@ deleteEntry :: Entry -> IO ()
 deleteEntry e = do
   moveDeletedFile $ photoFilePath e
   moveDeletedFile $ thumbFilePath e
-  moveDeletedFile $ entryPath (name e)
+  moveDeletedFile $ entryPath (id e)
 
 moveDeletedFile :: FilePath -> IO ()
 moveDeletedFile p = do
@@ -207,17 +210,17 @@ main = do
 
       text "OK"
 
-    put "/entries/:name" $ do
+    put "/entries/:id" $ do
       entry <- jsonData
       liftIO $ do
         writeEntryFile entry
         generateIndex
       text "OK"
 
-    delete "/entries/:name" $ do
-      n <- param "name"
+    delete "/entries/:id" $ do
+      id <- param "id"
       liftIO $ do
-        me <- readEntryFile (entryPath n)
+        me <- readEntryFile (entryPath id)
         case me of
           Nothing -> return ()
           Just e  -> do
