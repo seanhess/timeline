@@ -1,8 +1,10 @@
 
 .week {
-  height: 200px;
-  overflow: hidden;
+  /*height: 200px;*/
+  /*overflow: hidden;*/
   position: relative;
+  margin: 10px;
+  min-height: 200px;
 }
 
 body {
@@ -16,12 +18,13 @@ body {
   transform: rotate(90deg);
   transform-origin: left top 0;
   position: absolute;
-  left: 20px;
+  /*left: 20px;*/
+  top: 10px;
 }
 
 .week-content {
-  position: absolute;
-  left: 20px;
+  /*position: absolute;*/
+  /*left: 20px;*/
 }
 
 .entry {
@@ -31,6 +34,7 @@ body {
   position: relative;
   background-size: cover;
   display: inline-block;
+  margin: 2px;
 }
 
 .entry-link:hover .entry-overlay {
