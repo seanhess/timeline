@@ -93,11 +93,6 @@ exports.emptyMoment = function(date) {
 // group them by week, where week is "Dec 13", etc. Or, hmm... where week is another moment
 exports.groupByWeek = function(entries) {
 
-  // how am I going to do this?
-  // I'm going back through the entries to... as far as they go
-  // I could sort them by date? or maybe make it so it doesn't matter
-
-  // maybe it would be good to get the earliest one, so I can initialize the groups
   var es = entries.toArray()
   var invalidEntries = es.filter((e) => !date(e))
   var validEntries = es.filter((e) => date(e))
@@ -105,6 +100,7 @@ exports.groupByWeek = function(entries) {
   var earliestToLatest = sortBy(validEntries, date)
   var first = head(earliestToLatest)
   var firstDate = (first) ? moment(date(first)) : moment()
+  //console.log("FIRST DATE", firstDate.toString())
 
   var weekDates = weeksBetween(firstDate, moment()).reverse()
   var startingWeeks = {}
@@ -154,7 +150,7 @@ function weeksBetween(start, end) {
   // I need a range... how?
   while (start.unix() <= end.unix()) {
     weeks.push(start)
-    start = moment(start).day(7)
+    start = moment(start).day(8)
   }
 
   return weeks
@@ -172,7 +168,19 @@ function week(entry) {
 // make it a moment or clone it
 function startOfWeek(date) {
   var d = moment(date)
-  return d.set('date', d.date() - d.day())
+  var day = d.day()
+  if (day === 0) {
+    d = d.day(-6)
+    return d
+  }
+  else {
+    return d.day(1)
+  }
+  //var newDate = d.set('date', d.date() - d.day())
+  //console.log("New Date", newDate.toString())
+  // set day of the week to monday. 
+  // if it is a sunday, set it to last monday
+  return newDate
 }
 
 function formatDate(dateMoment) {

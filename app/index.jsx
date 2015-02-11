@@ -26,9 +26,7 @@ var App = React.createClass({
     var contents = this.props.currentPage()
 
     return <div style={{padding: 10, color: '#AAA'}}>
-      <Editor.MomentDropper>
-        <div>{contents}</div>
-      </Editor.MomentDropper>
+      <div>{contents}</div>
     </div>
   }
 })

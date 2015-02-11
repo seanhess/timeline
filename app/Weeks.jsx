@@ -2,6 +2,7 @@ var React = require('react')
 var component = require('omniscient')
 var {assign} = require('lodash')
 var Entries = require('./Entries')
+var {MomentDropper} = require('./Editor')
 var moment = require("moment")
 var page = require('page')
 
@@ -13,7 +14,11 @@ module.exports = component(function({entries}) {
     return <Week week={week} entries={grouped[week]} key={week}/>
   })
 
-  return <div className="weeks">{rows}</div>
+  return <div>
+    <MomentDropper onFile={onFile}>
+      <div className="weeks">{rows}</div>
+    </MomentDropper>
+  </div>
 }).jsx
 
 var Week = component(function({week, entries}) {
@@ -68,3 +73,26 @@ function bgImage(src) {
     backgroundImage: 'url("' + src + '")'
   }
 }
+
+
+
+
+
+var UPLOAD_URI = "/files"
+
+function onFile(file) {
+  console.log("DROP FILE", file)
+  var xhr = new XMLHttpRequest()
+  var fd = new FormData()
+  xhr.open("POST", UPLOAD_URI, true);
+  xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4) {
+        if (xhr.status == 200) {
+          window.location.reload()
+        }
+      }
+  }
+  fd.append('file', file)
+  xhr.send(fd)
+}
+

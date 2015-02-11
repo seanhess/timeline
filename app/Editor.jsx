@@ -7,27 +7,30 @@ var component = require('omniscient')
 var Entries = require('./Entries')
 var page = require('page')
 
-var UPLOAD_URI = "/files"
+//function updateEntryImage(entry) {
+  //return function(file) {
+    //console.log("DROP FILE", entry.get('name'), file)
+    //var xhr = new XMLHttpRequest()
+    //var fd = new FormData()
+    //var url = "/entries/"+entry.get('name')+'/image'
+    //console.log("URL", url, entry.toJS())
+    //xhr.open("PUT", url, true);
+    //xhr.onreadystatechange = function() {
+        //if (xhr.readyState == 4) {
+          //if (xhr.status == 200) {
+            //window.location.reload()
+          //}
+        //}
+    //}
+    //fd.append('file', file)
+    //xhr.send(fd)
+  //}
+//}
 
-function onFile(file) {
-  console.log("DROP FILE", file)
-  var xhr = new XMLHttpRequest()
-  var fd = new FormData()
-  xhr.open("POST", UPLOAD_URI, true);
-  xhr.onreadystatechange = function() {
-      if (xhr.readyState == 4) {
-        if (xhr.status == 200) {
-          window.location.reload()
-        }
-      }
-  }
-  fd.append('file', file)
-  xhr.send(fd)
-}
 
-exports.MomentDropper = React.createClass({
+var MomentDropper = exports.MomentDropper = React.createClass({
   render: function() {
-    return <Dropzone handler={onFile} size={200} message="Drag and drop a file here">
+    return <Dropzone handler={this.props.onFile} size={200} message="Drag and drop a file here">
       <div style={{width: '100%', height: '100%'}}>
         {this.props.children}
       </div>
