@@ -48,23 +48,22 @@ var Week = component(function({week, entries}) {
 var Entry = component(function({entry}) {
   var url = entry.get('url')
 
-  //function onClick() {
-    //Entries.edit(entry)
-  //}
-
   var url = "/details/" + entry.get('name')
+
+  var infoStyle = {
+    display: (entry.get('image')) ? "none" : "block"
+  }
 
   return <div className="entry" style={bgImage(Entries.thumbUrl(entry))}>
     <a className="entry-link" href={url}>
-      <div className="entry-bg"></div>
+      <div className="entry-bg">
+        <div style={infoStyle}>{entry.get('comment')}</div>
+      </div>
       <div className="entry-overlay">
         <div>{entry.get('comment')}</div>
       </div>
     </a>
   </div>
-    //<h4>{entry.get('name')}</h4>
-    //<div style={dateStyle}>{entry.get('date')}</div>
-    //<div style={typeStyle}>{entry.get('entryType')}</div>
 }).jsx
 
 

@@ -395,23 +395,22 @@
 	var Entry = component(function($__0) {var entry=$__0.entry;
 	  var url = entry.get('url')
 
-	  //function onClick() {
-	    //Entries.edit(entry)
-	  //}
-
 	  var url = "/details/" + entry.get('name')
+
+	  var infoStyle = {
+	    display: (entry.get('image')) ? "none" : "block"
+	  }
 
 	  return React.createElement("div", {className: "entry", style: bgImage(Entries.thumbUrl(entry))}, 
 	    React.createElement("a", {className: "entry-link", href: url}, 
-	      React.createElement("div", {className: "entry-bg"}), 
+	      React.createElement("div", {className: "entry-bg"}, 
+	        React.createElement("div", {style: infoStyle}, entry.get('comment'))
+	      ), 
 	      React.createElement("div", {className: "entry-overlay"}, 
 	        React.createElement("div", null, entry.get('comment'))
 	      )
 	    )
 	  )
-	    //<h4>{entry.get('name')}</h4>
-	    //<div style={dateStyle}>{entry.get('date')}</div>
-	    //<div style={typeStyle}>{entry.get('entryType')}</div>
 	}).jsx
 
 
