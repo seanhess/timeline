@@ -14,7 +14,10 @@ cabal-dev
 cabal.sandbox.config
 cabal.config
 
+entires.json
+data/*/*.json
 data/deleted
+data*
 build/bundle.js
 
 
